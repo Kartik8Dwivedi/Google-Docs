@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Quill from 'quill'
 
 import 'quill/dist/quill.snow.css'
@@ -25,6 +25,10 @@ const Editor = () => {
 
       ["clean"], // remove formatting button
     ];
+
+    const [socket, setSocket] = useState();
+    const [quill, setQuill] = useState();
+
     useEffect(() => {
         const quillServer = new Quill('#editor', {
             theme: 'snow',
@@ -32,14 +36,31 @@ const Editor = () => {
                 toolbar: toolbarOptions
             },
         })
+        setQuill(quillServer)
     }, []);
-    useEffect(() => {
-        const socket = io('http://localhost:4000')
 
+    useEffect(() => {
+        const s = io("http://localhost:4000");
+        setSocket(s);
         return () => {
-            socket.disconnect()
-        }
-        }, [])
+          s.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (quill === null || socket=== null) return;
+
+          const handleChange = (delta, oldDelta, source) => {
+            if (source !== "user") return;
+            socket?.emit("send-changes", delta);
+          };
+
+          quill?.on("text-change", handleChange);
+
+          return () => {
+            quill?.off("text-change", handleChange);
+          };
+    }, [quill, socket]);
   return (
     <div className="bg-slate-200 flex flex-col items-center">
       <div className="bg-white w-[60vw] mx-auto min-h-[100vh] mt-10 shadow-2xl text-black z-2 p-16" id="editor"></div>
