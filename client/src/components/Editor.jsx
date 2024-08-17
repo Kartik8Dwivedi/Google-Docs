@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import Quill from 'quill'
 
 import 'quill/dist/quill.snow.css'
+import { io } from 'socket.io-client';
 
 const Editor = () => {
     const toolbarOptions = [
@@ -31,7 +32,14 @@ const Editor = () => {
                 toolbar: toolbarOptions
             },
         })
-    })
+    }, []);
+    useEffect(() => {
+        const socket = io('http://localhost:4000')
+
+        return () => {
+            socket.disconnect()
+        }
+        }, [])
   return (
     <div className="bg-slate-200 flex flex-col items-center">
       <div className="bg-white w-[60vw] mx-auto min-h-[100vh] mt-10 shadow-2xl text-black z-2 p-16" id="editor"></div>
