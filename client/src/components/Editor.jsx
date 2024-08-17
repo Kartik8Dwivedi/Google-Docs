@@ -4,6 +4,8 @@ import Quill from 'quill'
 import 'quill/dist/quill.snow.css'
 import { io } from 'socket.io-client';
 
+import { useParams } from 'react-router-dom';
+
 const Editor = () => {
     const toolbarOptions = [
       ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -26,6 +28,8 @@ const Editor = () => {
       ["clean"], // remove formatting button
     ];
 
+    const id = useParams().id;
+
     const [socket, setSocket] = useState();
     const [quill, setQuill] = useState();
 
@@ -36,6 +40,8 @@ const Editor = () => {
                 toolbar: toolbarOptions
             },
         })
+        quillServer.disable()
+        quillServer.setText('Loading...')
         setQuill(quillServer)
     }, []);
 
@@ -75,6 +81,21 @@ const Editor = () => {
         socket?.off("receive-changes", handleChange);
       };
     }, [quill, socket]);
+
+    useEffect(() => {
+        if (quill === null || socket === null) return;
+
+        socket?.once('load-document', (document) => {
+            quill?.setContents(document);
+            quill?.enable();
+        });
+
+        socket?.emit("get-document", id);
+
+        return () => {
+            socket?.emit("leave-document", id);
+            };
+    }, [quill, socket, id]);
 
   return (
     <div className="bg-slate-200 flex flex-col items-center">
