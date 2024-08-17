@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ql-toolbar.ql-snow{
+    /* making this sticky at top of the screen */
+    position: sticky;
+    top: 0;
+    border: 0px;
+    margin-top: 1em;
+    z-index: 1;
+    background-color: rgb(197, 248, 246);
+    padding: 1em 4em;
+}
+
+.ql-editor.ql-blank::before{
+    color: #a0aec0;
+    font-size: 1.5em;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+}
+/* now styling the p tag element in above div */
+.ql-editor p{
+    font-size: 1.2em;
+    font-weight: 400;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.5em;
+    margin-bottom: 1em;
+    min-height: 100vh;
+    min-width: 100%;
+}
