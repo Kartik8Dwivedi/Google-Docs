@@ -61,6 +61,21 @@ const Editor = () => {
             quill?.off("text-change", handleChange);
           };
     }, [quill, socket]);
+
+    useEffect(() => {
+      if (quill === null || socket === null) return;
+
+      const handleChange = (delta) => {
+        quill?.updateContents(delta);
+      };
+
+      socket?.on("receive-changes", handleChange);
+
+      return () => {
+        socket?.off("receive-changes", handleChange);
+      };
+    }, [quill, socket]);
+
   return (
     <div className="bg-slate-200 flex flex-col items-center">
       <div className="bg-white w-[60vw] mx-auto min-h-[100vh] mt-10 shadow-2xl text-black z-2 p-16" id="editor"></div>
