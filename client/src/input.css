@@ -9,7 +9,7 @@
     border: 0px;
     margin-top: 1em;
     z-index: 1;
-    background-color: rgb(197, 248, 246);
+    background-color: rgb(110, 244, 239);
     padding: 1em 4em;
 }
 
@@ -26,6 +26,6 @@
     font-family: 'Roboto', sans-serif;
     line-height: 1.5em;
     margin-bottom: 1em;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     min-width: 100%;
 }

@@ -9,6 +9,7 @@ import { v4 as uuid } from "uuid";
 import Editor from "./components/Editor";
 
 function App() {
+  console.log(typeof uuid())
   return (
     <Router>
       <Routes>

@@ -28,78 +28,86 @@ const Editor = () => {
       ["clean"], // remove formatting button
     ];
 
-    const id = useParams();
+    const {id} = useParams();
 
     const [socket, setSocket] = useState();
     const [quill, setQuill] = useState();
 
-    useEffect(() => {
-        const quillServer = new Quill('#editor', {
-            theme: 'snow',
-            modules: {
-                toolbar: toolbarOptions
-            },
-        })
-        quillServer.disable()
-        quillServer.setText('Loading...')
-        setQuill(quillServer)
-    }, []);
+useEffect(() => {
+  const quillServer = new Quill("#editor", {
+    theme: "snow",
+    modules: { toolbar: toolbarOptions },
+  });
+  quillServer.disable();
+  quillServer.setText("Loading the document...");
+  setQuill(quillServer);
+}, []);
 
-    useEffect(() => {
-        const s = io("http://localhost:4000");
-        setSocket(s);
-        return () => {
-          s.disconnect();
-        };
-    }, []);
+useEffect(() => {
+  const socketServer = io("http://localhost:4000");
+  setSocket(socketServer);
 
-    useEffect(() => {
-        if (quill === null || socket=== null) return;
+  return () => {
+    socketServer.disconnect();
+  };
+}, []);
 
-          const handleChange = (delta, oldDelta, source) => {
-            if (source !== "user") return;
-            socket?.emit("send-changes", delta);
-          };
+useEffect(() => {
+  if (socket === null || quill === null) return;
 
-          quill?.on("text-change", handleChange);
+  const handleChange = (delta, oldData, source) => {
+    if (source !== "user") return;
 
-          return () => {
-            quill?.off("text-change", handleChange);
-          };
-    }, [quill, socket]);
+    socket.emit("send-changes", delta);
+  };
 
-    useEffect(() => {
-      if (quill === null || socket === null) return;
+  quill && quill.on("text-change", handleChange);
 
-      const handleChange = (delta) => {
-        quill?.updateContents(delta);
-      };
+  return () => {
+    quill && quill.off("text-change", handleChange);
+  };
+}, [quill, socket]);
 
-      socket?.on("receive-changes", handleChange);
+useEffect(() => {
+  if (socket === null || quill === null) return;
 
-      return () => {
-        socket?.off("receive-changes", handleChange);
-      };
-    }, [quill, socket]);
+  const handleChange = (delta) => {
+    quill.updateContents(delta);
+  };
 
-    useEffect(() => {
-        if (quill === null || socket === null) return;
+  socket && socket.on("receive-changes", handleChange);
 
-        socket?.once('load-document', (document) => {
-            quill?.setContents(document);
-            quill?.enable();
-        });
+  return () => {
+    socket && socket.off("receive-changes", handleChange);
+  };
+}, [quill, socket]);
 
-        socket?.emit("get-document", id);
+useEffect(() => {
+  if (quill === null || socket === null) return;
 
-        return () => {
-            socket?.emit("leave-document", id);
-            };
-    }, [quill, socket, id]);
+  socket &&
+    socket.once("load-document", (document) => {
+      quill.setContents(document);
+      quill.enable();
+    });
 
+  socket && socket.emit("get-document", id);
+}, [quill, socket, id]);
+
+useEffect(() => {
+  if (socket === null || quill === null) return;
+
+  const interval = setInterval(() => {
+    socket.emit("save-document", quill.getContents());
+  }, 2000);
+
+  return () => {
+    clearInterval(interval);
+  };
+}, [socket, quill]);
   return (
-    <div className="bg-slate-200 flex flex-col items-center">
-      <div className="bg-white w-[60vw] mx-auto min-h-[100vh] mt-10 shadow-2xl text-black z-2 p-16" id="editor"></div>
+    <div className="bg-slate-200 flex flex-col items-center pt-10">
+      <div className="bg-white w-[60vw] mx-auto min-h-[100vh] shadow-2xl text-black z-2 p-16 mt-14" id="editor"></div>
     </div>
   );
 }
