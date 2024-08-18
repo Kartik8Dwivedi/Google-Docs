@@ -1,6 +1,9 @@
 import { Server } from "socket.io";
+import connection from "./database/db.js";
 
 const PORT = 4000;
+
+connection();
 
 const io = new Server(PORT, {
     cors: {
@@ -10,12 +13,17 @@ const io = new Server(PORT, {
 })
 
 io.on("connection", (socket) => {
-    console.log("New client connected");
+  socket.on("get-document", (documentId) => {
+    const data = "";
+    socket.join(documentId);
+    socket.emit("load-document", data);
+
     socket.on("send-changes", (delta) => {
-        socket.broadcast.emit("receive-changes", delta);
+      socket.broadcast.to(documentId).emit("receive-changes", delta);
     });
 
     socket.on("disconnect", () => {
-        console.log("Client disconnected");
+      console.log("Client disconnected");
     });
+  });
 });

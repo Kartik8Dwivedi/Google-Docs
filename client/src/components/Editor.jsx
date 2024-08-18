@@ -28,7 +28,7 @@ const Editor = () => {
       ["clean"], // remove formatting button
     ];
 
-    const id = useParams().id;
+    const id = useParams();
 
     const [socket, setSocket] = useState();
     const [quill, setQuill] = useState();

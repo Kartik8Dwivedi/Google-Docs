@@ -1,34 +1,22 @@
-import Editor from "./components/Editor";
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
-  useNavigate,
+  Route,
+  Navigate,
 } from "react-router-dom";
 import { v4 as uuid } from "uuid";
-import { useEffect } from "react";
+
+import Editor from "./components/Editor";
 
 function App() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const id = uuid();
-    navigate(`/docs/${id}`);
-  }, [navigate]);
-
-  return (
-    <Routes>
-      <Route path="/docs/:id" element={<Editor />} />
-    </Routes>
-  );
-}
-
-function AppWrapper() {
   return (
     <Router>
-      <App />
+      <Routes>
+        <Route path="/" element={<Navigate replace to={`/docs/${uuid()}`} />} />
+        <Route path="/docs/:id" element={<Editor />} />
+      </Routes>
     </Router>
   );
 }
 
-export default AppWrapper;
+export default App;
