@@ -44,7 +44,7 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  const socketServer = io("http://localhost:4000");
+  const socketServer = io("https://collaborite.onrender.com");
   setSocket(socketServer);
 
   return () => {
